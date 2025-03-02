@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced LLM Token Calculator</title>
+    <script src="https://unpkg.com/gpt-tokenizer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@deepseek/tokenizer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --secondary: #706ae5;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --success: #22c55e;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: var(--surface);
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.75rem;
+            padding: 1.5rem;
+            transition: transform 0.2s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: #94a3b8;
+        }
+
+        select, input, textarea {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.5rem;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        select:focus, input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        select:focus {
+            background: rgba(99, 102, 241, 0.1); 
+        }
+
+        select option {
+            background: var(--surface);
+            color: var(--text);
+            padding: 0.5rem;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .price-inputs {
+            display: grid;
+            gap: 1rem;
+        }
+
+        .results {
+            background: var(--surface);
+            border-radius: 0.75rem;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-value {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        button {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .helper-text {
+            font-size: 0.875rem;
+            color: #94a3b8;
+            margin-top: 0.5rem;
+        }
+
+        .model-info {
+            font-size: 0.875rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 1rem;
+            }
+            
+            .container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Advanced LLM Token Calculator</h1>
+            <p class="helper-text">Supports GPT, Claude, Gemini, Llama, and Mistral models</p>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <label for="model">Model</label>
+                <select id="model" onchange="updatePricing()">
+                    <optgroup label="OpenAI">
+                        <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                        <option value="gpt-4">GPT-4</option>
+                        <option value="gpt-4-turbo">GPT-4 Turbo</option>
+                    </optgroup>
+                    <optgroup label="DeepSeek">
+                        <option value="deepseek-chat">DeepSeek Chat</option>
+                        <option value="deepseek-moe-16b">DeepSeek-MoE-16B</option>
+                        <option value="deepseek-67b">DeepSeek-67B</option>
+                    </optgroup>
+                    <optgroup label="Anthropic">
+                        <option value="claude-3-opus">Claude 3 Opus</option>
+                        <option value="claude-3-sonnet">Claude 3 Sonnet</option>
+                    </optgroup>
+                    <optgroup label="Google">
+                        <option value="gemini-pro">Gemini Pro</option>
+                    </optgroup>
+                    <optgroup label="Meta">
+                        <option value="llama-2-70b">Llama 2 70B</option>
+                        <option value="llama-3-70b">Llama 3 70B</option>
+                    </optgroup>
+                    <optgroup label="Mistral">
+                        <option value="mistral-7b">Mistral 7B</option>
+                        <option value="mixtral-8x7b">Mixtral 8x7B</option>
+                    </optgroup>
+                </select>
+                <div class="model-info" id="model-info"></div>
+            </div>
+
+            <div class="card">
+                <div class="price-inputs">
+                    <div>
+                        <label for="input-price">Input Price ($/token)</label>
+                        <input type="number" id="input-price" step="0.000001">
+                    </div>
+                    <div>
+                        <label for="output-price">Output Price ($/token)</label>
+                        <input type="number" id="output-price" step="0.000001">
+                    </div>
+                </div>
+                <div class="helper-text">Prices update automatically when selecting models</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <label>Input Text</label>
+                <textarea id="input-text" placeholder="Enter your prompt..." oninput="debouncedCalculate()"></textarea>
+                <div class="helper-text">Tokens: <span id="input-tokens-preview">0</span></div>
+            </div>
+
+            <div class="card">
+                <label>Output Text</label>
+                <textarea id="output-text" placeholder="Enter response..." oninput="debouncedCalculate()"></textarea>
+                <div class="helper-text">Tokens: <span id="output-tokens-preview">0</span></div>
+            </div>
+        </div>
+
+        <button onclick="calculateTokens()">Calculate</button>
+
+        <div class="results">
+            <div class="metric">
+                <span>Input Tokens</span>
+                <span class="metric-value" id="input-tokens">0</span>
+            </div>
+            <div class="metric">
+                <span>Output Tokens</span>
+                <span class="metric-value" id="output-tokens">0</span>
+            </div>
+            <div class="metric">
+                <span>Total Tokens</span>
+                <span class="metric-value" id="total-tokens">0</span>
+            </div>
+            <div class="metric">
+                <span>Estimated Cost</span>
+                <span class="metric-value" id="cost">$0.00</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let timeoutId;
+        const MODEL_INFO = {
+            'gpt-3.5-turbo': { input: 0.0000015, output: 0.000002 },
+            'gpt-4': { input: 0.00003, output: 0.00006 },
+            'gpt-4-turbo': { input: 0.00001, output: 0.00003 },
+            'deepseek-chat': { input: 0.000001, output: 0.000002 },
+            'deepseek-moe-16b': { input: 0.0000008, output: 0.0000015 },
+            'deepseek-67b': { input: 0.0000009, output: 0.0000018 },
+            'claude-3-opus': { input: 0.000015, output: 0.000075 },
+            'claude-3-sonnet': { input: 0.000003, output: 0.000015 },
+            'gemini-pro': { input: 0.00000125, output: 0.00000375 },
+            'llama-2-70b': { input: 0.0000007, output: 0.0000007 },
+            'llama-3-70b': { input: 0.0000009, output: 0.0000009 },
+            'mistral-7b': { input: 0.0000002, output: 0.0000002 },
+            'mixtral-8x7b': { input: 0.0000006, output: 0.0000006 }
+        };
+
+        function debouncedCalculate() {
+            clearTimeout(timeoutId);
+            timeoutId = setTimeout(calculateTokens, 300);
+        }
+
+        function updatePricing() {
+            const model = document.getElementById('model').value;
+            const info = MODEL_INFO[model];
+            
+            document.getElementById('input-price').value = info.input;
+            document.getElementById('output-price').value = info.output;
+            document.getElementById('model-info').textContent = 
+                `Model: ${model} | Input: $${info.input}/token | Output: $${info.output}/token`;
+            
+            calculateTokens();
+        }
+
+        function calculateTokens() {
+            const model = document.getElementById('model').value;
+            const inputText = document.getElementById('input-text').value;
+            const outputText = document.getElementById('output-text').value;
+            const inputPrice = parseFloat(document.getElementById('input-price').value) || 0;
+            const outputPrice = parseFloat(document.getElementById('output-price').value) || 0;
+
+            let inputTokens, outputTokens;
+            if (model.startsWith('gpt')) {
+                inputTokens = GPTTokenizer.encode(inputText, model).length;
+                outputTokens = GPTTokenizer.encode(outputText, model).length;
+            } else if (model.startsWith('deepseek')) {
+                const tokenizer = new DeepSeekTokenizer();
+                inputTokens = tokenizer.encode(inputText).length;
+                outputTokens = tokenizer.encode(outputText).length;
+            } else {
+                inputTokens = Math.ceil(inputText.length / 4);
+                outputTokens = Math.ceil(outputText.length / 4);
+            }
+
+            const totalTokens = inputTokens + outputTokens;
+            const totalCost = (inputTokens * inputPrice) + (outputTokens * outputPrice);
+
+            document.getElementById('input-tokens-preview').textContent = inputTokens;
+            document.getElementById('output-tokens-preview').textContent = outputTokens;
+            document.getElementById('input-tokens').textContent = inputTokens;
+            document.getElementById('output-tokens').textContent = outputTokens;
+            document.getElementById('total-tokens').textContent = totalTokens;
+            document.getElementById('cost').textContent = `$${totalCost.toFixed(6)}`;
+        }
+
+        updatePricing();
+    </script>
+</body>
+</html>
