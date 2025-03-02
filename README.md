@@ -48,9 +48,9 @@ http://localhost:8000
 
 # Deployment 🚀
 GitHub Pages:
-i. Go to repository Settings > Pages
-ii. Select branch main and folder / (root)
-iii. Save - Your site will be at:
+1. Go to repository Settings > Pages
+2. Select branch main and folder / (root)
+3. Save - Your site will be at:
 
 ```
 https://<your-github-username>.github.io/<repository-name>/
