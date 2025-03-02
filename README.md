@@ -11,8 +11,8 @@ A web-based calculator for estimating token usage and costs across various large
 - Token preview while typing
 
 # Live Demo 🌐
-[!]
-https://llm-token-calculator-new.vercel.app/
+> [!]
+> https://llm-token-calculator-new.vercel.app/
 
 # Installation 💻
 Prerequisites:
