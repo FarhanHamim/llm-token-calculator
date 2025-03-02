@@ -104,12 +104,36 @@ const MODEL_INFO = {
 ```
 
 # Supported Models 🤖
-| Header1 | Header2 | 
+| Provider | Models | 
 | :---- | :----: |
-| Provider | Models |
 | OpenAI | GPT-3.5 Turbo, GPT-4, GPT-4 Turbo |
 | Anthropic | Claude 3 Opus, Claude 3 Sonnet |
 | Google | Gemini Pro |
 | Meta | Llama 2 70B, Llama 3 70B |
 | Mistral |	Mistral 7B, Mixtral 8x7B |
 | DeepSeek | DeepSeek Chat, MoE-16B, 67B |
+
+# Contributing 🤝
+1. Fork the repository
+2. Create feature branch:
+```
+git checkout -b feature/new-feature
+```
+3. Commit changes:
+```
+git commit -m 'Add some feature'
+```
+4. Push to branch:
+```
+git push origin feature/new-feature
+```
+5. Open a Pull Request
+
+# Acknowledgements 🙏
+* GPT Tokenizer: gpt-tokenizer library
+* Color Scheme: Inspired by Dracula Pro
+* UI Design: Modern Web Practices
+
+> [!NOTE]
+> Always verify actual model pricing and tokenization methods with official provider documentation. Token counts may vary slightly between implementations.
+
